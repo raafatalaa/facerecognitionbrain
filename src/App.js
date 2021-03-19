@@ -38,24 +38,39 @@ class App extends Component {
     this.state={
       input:  '',
       ImageUrl: '', 
+      box: {} ,
     }
   }
 
   onInputChange = (event) => {
      this.setState({input:event.target.value});  
   }
+  
+  claculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputimage');
+    const width = Number(image.width); 
+    const height = Number(image.height); 
+    //console.log(data);
+    return{
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row *height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row *height) 
+    }
+  }
+
+  displayFaceBox = (box) => {
+    this.setState({box: box});
+    //console.log(this.state.box,'aywa mawgood');
+  }
 
   onButtonClick = () => {
     this.setState({ImageUrl:this.state.input});
-    app.models.predict( "53e1df302c079b3db8a0a36033ed2d15", 
-    this.state.input).then(
-    function(response){
-      console.log(response); 
-    },
-    function(err){ 
-        console.log('errror' , err);
-    }
-    );
+    app.models.predict( "d02b4508df58432fbb84e800597b8959", 
+    this.state.input).
+    then((response) => this.displayFaceBox(this.claculateFaceLocation(response)))
+    .catch(err => console.log(err));
   }
 
 
@@ -71,7 +86,7 @@ class App extends Component {
           onInputChange={this.onInputChange} 
           onButtonClick={this.onButtonClick} 
           />
-          <FaceRecognition ImageUrl={this.state.ImageUrl}/>
+          <FaceRecognition box={this.state.box} ImageUrl={this.state.ImageUrl}/>
           
       </div>
     );
