@@ -42,7 +42,7 @@ class App extends Component {
       ImageUrl: '', 
       box: {} ,
       route: 'signin', 
-      isSigningedIn: false,
+      isSignedIn: false,
     }
   }
 
@@ -65,7 +65,7 @@ class App extends Component {
   }
 
   displayFaceBox = (box) => {
-    this.setState({box: box});
+  this.setState({box: box});
     //console.log(this.state.box,'aywa mawgood');
   }
 
@@ -79,10 +79,10 @@ class App extends Component {
 
   onRouteChange = (route) =>{
       if(route === 'signout'){
-        this.setState({isSigningedIn:false})
+        this.setState({isSignedIn:false})
       }
       else if(route==='home'){
-      this.setState({isSigningedIn:true}); 
+      this.setState({isSignedIn:true}); 
       }
       this.setState({route:route});
 
@@ -95,7 +95,7 @@ class App extends Component {
       return (
       <div className="App">
         <Particles className="particles" params={particlesOptions}/>
-        <Navigation onRouteChange={this.onRouteChange} isSigningedIn={this.state.isSigningedIn}/>
+        <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
           {this.state.route==='home'
           ?
           <div>
