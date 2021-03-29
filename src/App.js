@@ -2,6 +2,8 @@ import React , {Component} from 'react';
 import Particles, { InteractivityDetect } from 'react-particles-js';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'; 
 import Navigation from './components/Navigation/Navigation'; 
+import Signin from './components/Signin/Signin'; 
+import Register from './components/Register/Register'; 
 import Logo from './components/Logo/Logo'; 
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'; 
 import Rank from './components/Rank/Rank'; 
@@ -39,6 +41,8 @@ class App extends Component {
       input:  '',
       ImageUrl: '', 
       box: {} ,
+      route: 'signin', 
+      isSigningedIn: false,
     }
   }
 
@@ -73,21 +77,45 @@ class App extends Component {
     .catch(err => console.log(err));
   }
 
+  onRouteChange = (route) =>{
+      if(route === 'signout'){
+        this.setState({isSigningedIn:false})
+      }
+      else if(route==='home'){
+      this.setState({isSigningedIn:true}); 
+      }
+      this.setState({route:route});
+
+      console.log(route," ",this.state.isSigningedIn);
+  }
+
 
   render()
   {
       return (
       <div className="App">
         <Particles className="particles" params={particlesOptions}/>
-          <Navigation/>
-          <Logo/>
-          <Rank/>
-          <ImageLinkForm  
-          onInputChange={this.onInputChange} 
-          onButtonClick={this.onButtonClick} 
-          />
-          <FaceRecognition box={this.state.box} ImageUrl={this.state.ImageUrl}/>
-          
+        <Navigation onRouteChange={this.onRouteChange} isSigningedIn={this.state.isSigningedIn}/>
+          {this.state.route==='home'
+          ?
+          <div>
+            <Logo/>
+            <Rank/>
+            <ImageLinkForm  
+            onInputChange={this.onInputChange} 
+            onButtonClick={this.onButtonClick} 
+            />
+            <FaceRecognition box={this.state.box} ImageUrl={this.state.ImageUrl}/>
+            </div>
+            :
+            (
+              this.state.route==='signin'
+              ?<Signin onRouteChange={this.onRouteChange} />
+              :<Register onRouteChange={this.onRouteChange}/>
+            
+            )
+            
+          }
       </div>
     );
  }
