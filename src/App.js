@@ -43,13 +43,30 @@ class App extends Component {
       box: {} ,
       route: 'signin', 
       isSignedIn: false,
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
-
+ 
   onInputChange = (event) => {
      this.setState({input:event.target.value});  
   }
   
+  loadUser = (data) => {
+    this.setState({user:{
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    }})
+  }
+
   claculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputimage');
@@ -66,16 +83,31 @@ class App extends Component {
 
   displayFaceBox = (box) => {
   this.setState({box: box});
-    //console.log(this.state.box,'aywa mawgood');
   }
 
   onButtonClick = () => {
     this.setState({ImageUrl:this.state.input});
     app.models.predict( "d02b4508df58432fbb84e800597b8959", 
     this.state.input).
-    then((response) => this.displayFaceBox(this.claculateFaceLocation(response)))
+    then(response => {
+      if (response) {
+        fetch('http://localhost:5000/user/images', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            id: this.state.user.id
+          })
+        })
+          .then(response => response.json())
+          .then(count => {
+            this.setState(Object.assign(this.state.user, { entries: count}))
+          })
+
+      }
+      this.displayFaceBox(this.claculateFaceLocation(response))
+    })
     .catch(err => console.log(err));
-  }
+}
 
   onRouteChange = (route) =>{
       if(route === 'signout'){
@@ -100,7 +132,7 @@ class App extends Component {
           ?
           <div>
             <Logo/>
-            <Rank/>
+            <Rank user = {this.state.user}/>
             <ImageLinkForm  
             onInputChange={this.onInputChange} 
             onButtonClick={this.onButtonClick} 
@@ -110,8 +142,8 @@ class App extends Component {
             :
             (
               this.state.route==='signin'
-              ?<Signin onRouteChange={this.onRouteChange} />
-              :<Register onRouteChange={this.onRouteChange}/>
+              ?<Signin onRouteChange={this.onRouteChange} loadUser = {this.loadUser} />
+              :<Register onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
             
             )
             
