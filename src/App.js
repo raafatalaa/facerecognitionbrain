@@ -85,13 +85,14 @@ class App extends Component {
   this.setState({box: box});
   }
 
-  onButtonClick = () => {
+   onButtonClick =  () => {
     this.setState({ImageUrl:this.state.input});
     app.models.predict( "d02b4508df58432fbb84e800597b8959", 
     this.state.input).
     then(response => {
       if (response) {
-        fetch('http://localhost:5000/user/images', {
+        console.log(this.state.user.id);
+         fetch('http://localhost:5000/user/images', {
           method: 'put',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -100,8 +101,10 @@ class App extends Component {
         })
           .then(response => response.json())
           .then(count => {
-            this.setState(Object.assign(this.state.user, { entries: count}))
-          })
+            if(count){
+            this.setState(Object.assign(this.state.user, { entries: count.entries}))
+            }
+          });
 
       }
       this.displayFaceBox(this.claculateFaceLocation(response))
